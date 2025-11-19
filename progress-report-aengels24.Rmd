@@ -19,7 +19,7 @@ head(HallOfFame, 3)
 ```
 
 
-scraping from baseball-reference.com:
+scrape from baseball-reference.com:
 
 ```{r}
 
