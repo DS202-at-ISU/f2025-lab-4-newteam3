@@ -1,0 +1,11 @@
+---
+title: "progress-report-gracekolker.Rmd"
+author: "Grace Kolker"
+date: "2025-11-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
