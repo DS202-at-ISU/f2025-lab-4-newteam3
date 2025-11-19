@@ -9,3 +9,89 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+```{r}
+library(rvest)
+library(dplyr)
+library(stringr)
+library(Lahman)
+
+head(People)
+
+```
+
+```{r}
+
+url <- "[https://www.baseball-reference.com/awards/hof_2025.shtml](https://www.baseball-reference.com/awards/hof_2025.shtml)"
+
+
+
+tables <- page %>% html_table(fill = TRUE)
+
+
+
+raw_2025 <- tables[[1]]
+
+
+
+colnames(raw_2025) <- raw_2025[1, ]
+raw_2025 <- raw_2025[-1, ]
+
+
+
+colnames(raw_2025) <- make.names(colnames(raw_2025), unique = TRUE)
+
+
+
+names(raw_2025)
+
+```
+
+```{r}
+
+
+numeric_cols <- intersect(
+c("Votes", "X.vote", "HOFm", "HOFs", "Yrs", "WAR", "WAR7", "JAWS"),
+names(raw_2025)
+)
+
+
+clean_2025 <- raw_2025 %>%
+mutate(across(all_of(numeric_cols), ~ as.numeric(str_replace_all(., "[,%]", ""))))
+
+```
+
+
+```{r}
+player_lookup <- People %>%
+select(playerID, nameFirst, nameLast) %>%
+mutate(Name = paste(nameFirst, nameLast))
+
+```
+
+```{r}
+hof_2025_lahman <- clean_2025 %>%
+left_join(player_lookup, by = "Name") %>%
+mutate(
+yearID = 2025,
+votedBy = "BBWAA",
+ballots = HOFm,
+needed = HOFs,
+votes = Votes,
+inducted = ifelse(votes / ballots >= 0.75, "Y", "N"),
+category = "Player",
+needed_note = NA
+) %>%
+select(playerID, yearID, votedBy, ballots, needed, votes, inducted, category, needed_note)
+
+
+hof_2025_lahman
+
+```
+
+ Writing csv to show I can do it but we are not using my result as it is not fully confident and portentially correct. My teammates turned out better so we will use theirs. 
+```{r}
+#write.csv(hof_2025_lahman, "HallOfFame_2025_scraped.csv", row.names = FALSE)
+```
+
+
